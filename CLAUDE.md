@@ -11,7 +11,7 @@ Distributed as a `dotnet tool` (NuGet package `XperienceCommunity.Sentinel`, CLI
 ## Solution Layout
 
 ```
-kentico-sentinel/
+xperience-community-sentinel/
 ├── src/XperienceCommunity.Sentinel/              .NET 9 console app (the tool)
 ├── tests/XperienceCommunity.Sentinel.Tests/      xUnit test project
 ├── docs/                             Architecture notes, rule catalog

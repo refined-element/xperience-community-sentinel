@@ -277,7 +277,7 @@ Issues and PRs welcome. New check ideas especially — the goal is to be **the**
 
 ```bash
 dotnet build XperienceCommunity.Sentinel.slnx   # full solution: Core + XbyK + CLI + tests
-dotnet test XperienceCommunity.Sentinel.slnx    # 36+ unit tests — checks, sanitizer, runner, notifiers
+dotnet test XperienceCommunity.Sentinel.slnx    # unit tests — checks, sanitizer, runner, notifiers
 ./scripts/dev-reinstall.ps1         # CLI: pack + reinstall the global tool
 ./scripts/scan.ps1 -Project F:\RefinedElement\re-xbk  # verify against a real site
 ```
