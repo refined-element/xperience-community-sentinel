@@ -36,25 +36,25 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Restore
-        run: dotnet restore KenticoSentinel.slnx
+        run: dotnet restore XperienceCommunity.Sentinel.slnx
 
       - name: Build
-        run: dotnet build KenticoSentinel.slnx --configuration Release --no-restore -p:Version=${{ steps.ver.outputs.version }}
+        run: dotnet build XperienceCommunity.Sentinel.slnx --configuration Release --no-restore -p:Version=${{ steps.ver.outputs.version }}
 
       - name: Test
-        run: dotnet test KenticoSentinel.slnx --configuration Release --no-build --verbosity minimal
+        run: dotnet test XperienceCommunity.Sentinel.slnx --configuration Release --no-build --verbosity minimal
 
       - name: Pack Core library
-        run: dotnet pack src/KenticoSentinel.Core/KenticoSentinel.Core.csproj --configuration Release --no-build -p:Version=${{ steps.ver.outputs.version }} --output ./artifacts
+        run: dotnet pack src/XperienceCommunity.Sentinel.Core/XperienceCommunity.Sentinel.Core.csproj --configuration Release --no-build -p:Version=${{ steps.ver.outputs.version }} --output ./artifacts
 
       - name: Pack XbyK integration
-        run: dotnet pack src/KenticoSentinel.XbyK/KenticoSentinel.XbyK.csproj --configuration Release --no-build -p:Version=${{ steps.ver.outputs.version }} --output ./artifacts
+        run: dotnet pack src/XperienceCommunity.Sentinel.Module/XperienceCommunity.Sentinel.Module.csproj --configuration Release --no-build -p:Version=${{ steps.ver.outputs.version }} --output ./artifacts
 
       - name: Pack XbyK Admin UI
-        run: dotnet pack src/KenticoSentinel.XbyK.Admin/KenticoSentinel.XbyK.Admin.csproj --configuration Release --no-build -p:Version=${{ steps.ver.outputs.version }} --output ./artifacts
+        run: dotnet pack src/XperienceCommunity.Sentinel.Admin/XperienceCommunity.Sentinel.Admin.csproj --configuration Release --no-build -p:Version=${{ steps.ver.outputs.version }} --output ./artifacts
 
       - name: Pack CLI tool
-        run: dotnet pack src/KenticoSentinel/KenticoSentinel.csproj --configuration Release --no-build -p:Version=${{ steps.ver.outputs.version }} --output ./artifacts
+        run: dotnet pack src/XperienceCommunity.Sentinel/XperienceCommunity.Sentinel.csproj --configuration Release --no-build -p:Version=${{ steps.ver.outputs.version }} --output ./artifacts
 
       - name: Push to NuGet
         env:

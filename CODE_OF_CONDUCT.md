@@ -1,6 +1,6 @@
 # Code of Conduct
 
-Kentico Sentinel adopts the [Contributor Covenant, version 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) as its Code of Conduct.
+Sentinel for Xperience by Kentico adopts the [Contributor Covenant, version 2.1](https://www.contributor-covenant.org/version/2/1/code_of_conduct/) as its Code of Conduct.
 
 By participating in this project — through issues, pull requests, discussions, or any other channel — you agree to abide by its terms. We chose the Contributor Covenant because it is widely understood across open-source communities and because adopting a well-known standard rather than inventing our own keeps the bar for contributors clear.
 
