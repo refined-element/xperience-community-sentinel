@@ -4,18 +4,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working in this
 
 ## Project Overview
 
-**Kentico Sentinel** — a free, open-source CLI that scans Xperience by Kentico projects for health issues. "ESLint for Kentico." Built by Refined Element.
+**Sentinel for Xperience by Kentico** — a free, open-source CLI that scans Xperience by Kentico projects for health issues. "ESLint for Kentico." Built by Refined Element.
 
-Distributed as a `dotnet tool` (NuGet package `RefinedElement.Kentico.Sentinel`, CLI command `sentinel`).
+Distributed as a `dotnet tool` (NuGet package `XperienceCommunity.Sentinel`, CLI command `sentinel`).
 
 ## Solution Layout
 
 ```
 kentico-sentinel/
-├── src/KenticoSentinel/              .NET 9 console app (the tool)
-├── tests/KenticoSentinel.Tests/      xUnit test project
+├── src/XperienceCommunity.Sentinel/              .NET 9 console app (the tool)
+├── tests/XperienceCommunity.Sentinel.Tests/      xUnit test project
 ├── docs/                             Architecture notes, rule catalog
-├── KenticoSentinel.sln
+├── XperienceCommunity.Sentinel.slnx
 └── README.md
 ```
 
@@ -24,14 +24,14 @@ kentico-sentinel/
 ```bash
 dotnet build               # Build the solution
 dotnet test                # Run tests
-dotnet run --project src/KenticoSentinel -- scan --path ./some-xbk-repo
-dotnet pack src/KenticoSentinel -c Release   # Produce the .nupkg
+dotnet run --project src/XperienceCommunity.Sentinel -- scan --path ./some-xbk-repo
+dotnet pack src/XperienceCommunity.Sentinel -c Release   # Produce the .nupkg
 ```
 
 Install the packed tool locally:
 
 ```bash
-dotnet tool install --global --add-source ./src/KenticoSentinel/bin/Release RefinedElement.Kentico.Sentinel
+dotnet tool install --global --add-source ./src/XperienceCommunity.Sentinel/bin/Release XperienceCommunity.Sentinel
 ```
 
 ## Architecture Principles
@@ -69,7 +69,7 @@ dotnet tool install --global --add-source ./src/KenticoSentinel/bin/Release Refi
 
 ## Conventions
 
-- **Namespace:** `RefinedElement.Kentico.Sentinel`
+- **Namespace:** `XperienceCommunity.Sentinel`
 - **Target:** `net9.0` (matches XbyK 31.x runtime)
 - **Warnings as errors** is enabled. Fix warnings; don't suppress.
 - **Nullable reference types** on. Use `?` explicitly.

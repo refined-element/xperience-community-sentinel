@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/XperienceCommunity.Sentinel.Core/XperienceCommunity.Sentinel.Core.csproj" />
+    <Project Path="src/XperienceCommunity.Sentinel.Module/XperienceCommunity.Sentinel.Module.csproj" />
+    <Project Path="src/XperienceCommunity.Sentinel.Admin/XperienceCommunity.Sentinel.Admin.csproj" />
+    <Project Path="src/XperienceCommunity.Sentinel/XperienceCommunity.Sentinel.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/XperienceCommunity.Sentinel.Tests/XperienceCommunity.Sentinel.Tests.csproj" />
+  </Folder>
+</Solution>

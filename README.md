@@ -1,6 +1,6 @@
-# Kentico Sentinel
+# Sentinel for Xperience by Kentico
 
-<img src="docs/logo.svg" alt="Kentico Sentinel" width="48" align="left" style="margin-right:12px">
+<img src="docs/logo.svg" alt="Sentinel for Xperience by Kentico" width="48" align="left" style="margin-right:12px">
 
 > **Health scanner for Xperience by Kentico projects.** ESLint for XbyK.
 
@@ -20,7 +20,7 @@ Built by [Refined Element](https://refinedelement.com) — Kentico Community Lea
 | Kentico Xperience 13 | ❌ Not supported | KX13 uses the legacy content tree (`CMS_Document` / `CMS_Tree`) and ASP.NET 4.x config patterns. A separate scanner would be needed; we have no plans to build one. |
 | Kentico 12 and earlier | ❌ Not supported | End of mainstream support. |
 
-If you're on KX13 or older, this tool won't help you. Please don't [open an issue](https://github.com/refined-element/kentico-sentinel/issues) asking us to backport.
+If you're on KX13 or older, this tool won't help you. Please don't [open an issue](https://github.com/refined-element/xperience-community-sentinel/issues) asking us to backport.
 
 ## Install in an XbyK site (recommended)
 
@@ -29,7 +29,7 @@ Drop one NuGet reference into your XbyK project, wire one line in `Program.cs`, 
 ### 1. Reference the package
 
 ```xml
-<PackageReference Include="RefinedElement.Kentico.Sentinel.XbyK" Version="0.2.3-alpha" />
+<PackageReference Include="XperienceCommunity.Sentinel.Module" Version="0.4.5-alpha" />
 ```
 
 ### 2. Register the services
@@ -37,9 +37,9 @@ Drop one NuGet reference into your XbyK project, wire one line in `Program.cs`, 
 In `Program.cs`, after `builder.Services.AddKentico(...)`:
 
 ```csharp
-using RefinedElement.Kentico.Sentinel.XbyK.DependencyInjection;
+using XperienceCommunity.Sentinel.Module.DependencyInjection;
 
-builder.Services.AddKenticoSentinel(builder.Configuration);
+builder.Services.AddSentinel(builder.Configuration);
 ```
 
 ### 3. Configure (optional — every field has a sensible default)
@@ -73,22 +73,22 @@ Values below are the **actual code defaults** — omit a key entirely to get the
 
 ### 4. First run
 
-On the next app-start Sentinel's installer upserts three tables (`RefinedElement_SentinelScanRun`, `RefinedElement_SentinelFinding`, `RefinedElement_SentinelFindingAck`) in the CMS database. The scheduled task class registers automatically.
+On the next app-start Sentinel's installer upserts three tables (`XperienceCommunity_SentinelScanRun`, `XperienceCommunity_SentinelFinding`, `XperienceCommunity_SentinelFindingAck`) in the CMS database. The scheduled task class registers automatically.
 
-Open **Configuration → Scheduled tasks** in Kentico admin, create a new task with implementation `RefinedElement.SentinelScan` (the dropdown list), set a cadence, save, enable. Hit **Execute now** to run the first scan.
+Open **Configuration → Scheduled tasks** in Kentico admin, create a new task with implementation `XperienceCommunity.SentinelScan` (the dropdown list), set a cadence, save, enable. Hit **Execute now** to run the first scan.
 
 Cadence lives in Kentico's Scheduled Tasks UI — no cron config in code.
 
 ### 5. Where output lands
 
-- **`RefinedElement_SentinelScanRun`** — one row per scan execution (trigger, duration, error/warning/info counts, status)
-- **`RefinedElement_SentinelFinding`** — one row per finding with a stable fingerprint for cross-scan acknowledgments
-- **`RefinedElement_SentinelFindingAck`** — one row per acknowledged/snoozed finding, keyed by fingerprint. The installer provisions the table so deploys don't need a migration step when the Admin UI (v0.3.x) lights up the ack actions; it stays empty until then.
+- **`XperienceCommunity_SentinelScanRun`** — one row per scan execution (trigger, duration, error/warning/info counts, status)
+- **`XperienceCommunity_SentinelFinding`** — one row per finding with a stable fingerprint for cross-scan acknowledgments
+- **`XperienceCommunity_SentinelFindingAck`** — one row per acknowledged/snoozed finding, keyed by fingerprint. The installer provisions the table so deploys don't need a migration step when the Admin UI (v0.3.x) lights up the ack actions; it stays empty until then.
 - **`CMS_EventLog`** — summary entry per scan (source = `Sentinel`) + one entry per finding at or above `SeverityThreshold`, up to `EventLogIntegration.MaxEntriesPerScan`; if more findings qualify, Sentinel writes a single additional summary noting the suppressed event-log entries
 
 ### 6. Admin UI (optional)
 
-The companion package **`RefinedElement.Kentico.Sentinel.XbyK.Admin`** adds **Configuration → Sentinel** to the admin left-nav with:
+The companion package **`XperienceCommunity.Sentinel.Admin`** adds **Configuration → Sentinel** to the admin left-nav with:
 
 - **Dashboard** — latest scan KPIs, 30-day severity trend, recent scans, top rule offenders with inline remediation
 - **Scan history** — every scan run, sortable + filterable
@@ -101,10 +101,10 @@ The companion package **`RefinedElement.Kentico.Sentinel.XbyK.Admin`** adds **Co
 Install:
 
 ```xml
-<PackageReference Include="RefinedElement.Kentico.Sentinel.XbyK.Admin" Version="0.4.3-alpha" />
+<PackageReference Include="XperienceCommunity.Sentinel.Admin" Version="0.4.5-alpha" />
 ```
 
-No extra `Program.cs` wiring — the existing `AddKenticoSentinel()` call covers DI. The admin pages surface automatically.
+No extra `Program.cs` wiring — the existing `AddSentinel()` call covers DI. The admin pages surface automatically.
 
 #### Screenshots
 
@@ -126,11 +126,11 @@ No extra `Program.cs` wiring — the existing `AddKenticoSentinel()` call covers
 
 ### What stays after `dotnet remove package`
 
-- `RefinedElement_SentinelScanRun` — historical scan runs
-- `RefinedElement_SentinelFinding` — findings from each run
-- `RefinedElement_SentinelFindingAck` — operator ack / snooze / note state
+- `XperienceCommunity_SentinelScanRun` — historical scan runs
+- `XperienceCommunity_SentinelFinding` — findings from each run
+- `XperienceCommunity_SentinelFindingAck` — operator ack / snooze / note state
 - `CMS_Class` rows (three `DataClassInfo` registrations for the tables above)
-- `CMS_ScheduledTask` row (`TaskName = 'RefinedElement.SentinelScan'`) — will fail silently on its next tick because the handler class no longer loads. Not catastrophic, but noisy in the event log.
+- `CMS_ScheduledTask` row (`TaskName = 'XperienceCommunity.SentinelScan'`) — will fail silently on its next tick because the handler class no longer loads. Not catastrophic, but noisy in the event log.
 
 Reinstalling the package picks up exactly where the previous version left off.
 
@@ -140,19 +140,19 @@ If you actually want Sentinel *gone* — gone-gone — remove the package from y
 
 ```sql
 -- Stop the scheduled task from firing against a missing handler.
-DELETE FROM CMS_ScheduledTask WHERE TaskName = 'RefinedElement.SentinelScan';
+DELETE FROM CMS_ScheduledTask WHERE TaskName = 'XperienceCommunity.SentinelScan';
 
 -- Drop the data tables. IF EXISTS means the script is idempotent — safe to re-run if an
 -- earlier step failed partway through.
-DROP TABLE IF EXISTS RefinedElement_SentinelFindingAck;
-DROP TABLE IF EXISTS RefinedElement_SentinelFinding;
-DROP TABLE IF EXISTS RefinedElement_SentinelScanRun;
+DROP TABLE IF EXISTS XperienceCommunity_SentinelFindingAck;
+DROP TABLE IF EXISTS XperienceCommunity_SentinelFinding;
+DROP TABLE IF EXISTS XperienceCommunity_SentinelScanRun;
 
 -- Drop Kentico's metadata about the tables.
 DELETE FROM CMS_Class WHERE ClassName IN (
-    'refinedelement.sentinelfindingack',
-    'refinedelement.sentinelfinding',
-    'refinedelement.sentinelscanrun'
+    'xperiencecommunity.sentinelfindingack',
+    'xperiencecommunity.sentinelfinding',
+    'xperiencecommunity.sentinelscanrun'
 );
 ```
 
@@ -164,7 +164,7 @@ Same checks, one-shot mode, no install in your XbyK project.
 
 ```bash
 # Prerelease until v1.0 — use --prerelease or an explicit version.
-dotnet tool install -g RefinedElement.Kentico.Sentinel --prerelease
+dotnet tool install -g XperienceCommunity.Sentinel --prerelease
 
 # Static code checks only (works against XbyK 29+)
 sentinel scan --path ./MyXperienceSite
@@ -276,8 +276,8 @@ Issues and PRs welcome. New check ideas especially — the goal is to be **the**
 ### Dev loop
 
 ```bash
-dotnet build KenticoSentinel.slnx   # full solution: Core + XbyK + CLI + tests
-dotnet test KenticoSentinel.slnx    # 36+ unit tests — checks, sanitizer, runner, notifiers
+dotnet build XperienceCommunity.Sentinel.slnx   # full solution: Core + XbyK + CLI + tests
+dotnet test XperienceCommunity.Sentinel.slnx    # 36+ unit tests — checks, sanitizer, runner, notifiers
 ./scripts/dev-reinstall.ps1         # CLI: pack + reinstall the global tool
 ./scripts/scan.ps1 -Project F:\RefinedElement\re-xbk  # verify against a real site
 ```
@@ -286,13 +286,13 @@ dotnet test KenticoSentinel.slnx    # 36+ unit tests — checks, sanitizer, runn
 
 | Project | Purpose |
 |---|---|
-| `src/KenticoSentinel.Core` | Check engine, registry, sanitizer, reporting. Framework-agnostic. |
-| `src/KenticoSentinel.XbyK` | Embedded XbyK integration — Info models, installer, scheduled task, notifiers. |
-| `src/KenticoSentinel.XbyK.Admin` | Admin UI — Dashboard, Scan history, Findings, Scan detail, Compare scans, Request-a-quote, Settings. Optional — headless deploys can skip it. |
-| `src/KenticoSentinel` | CLI tool (`sentinel`). |
-| `tests/KenticoSentinel.Tests` | xUnit tests across all packages. |
+| `src/XperienceCommunity.Sentinel.Core` | Check engine, registry, sanitizer, reporting. Framework-agnostic. |
+| `src/XperienceCommunity.Sentinel.Module` | Embedded XbyK integration — Info models, installer, scheduled task, notifiers. |
+| `src/XperienceCommunity.Sentinel.Admin` | Admin UI — Dashboard, Scan history, Findings, Scan detail, Compare scans, Request-a-quote, Settings. Optional — headless deploys can skip it. |
+| `src/XperienceCommunity.Sentinel` | CLI tool (`sentinel`). |
+| `tests/XperienceCommunity.Sentinel.Tests` | xUnit tests across all packages. |
 
-Each check is a single class in `src/KenticoSentinel.Core/Checks/` implementing `ICheck`. Register it in `Core/CheckRegistry.cs` and it ships in the next run of both the CLI and the embedded scheduled task.
+Each check is a single class in `src/XperienceCommunity.Sentinel.Core/Checks/` implementing `ICheck`. Register it in `Core/CheckRegistry.cs` and it ships in the next run of both the CLI and the embedded scheduled task.
 
 ## Links
 

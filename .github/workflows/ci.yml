@@ -50,23 +50,23 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: src/KenticoSentinel.XbyK.Admin/Client/package-lock.json
+          cache-dependency-path: src/XperienceCommunity.Sentinel.Admin/Client/package-lock.json
 
       # Separate npm cache key from the .NET restore cache so dep changes in one don't invalidate
       # the other.
       - name: Restore .NET
-        run: dotnet restore KenticoSentinel.slnx
+        run: dotnet restore XperienceCommunity.Sentinel.slnx
 
       # Build in Release to exercise the same webpack mode CI produces for packaging. Admin's
       # MSBuild NpmInstall + NpmBuildClient targets run as part of this step.
       - name: Build
-        run: dotnet build KenticoSentinel.slnx --configuration Release --no-restore
+        run: dotnet build XperienceCommunity.Sentinel.slnx --configuration Release --no-restore
 
       # TypeScript also gets type-checked via `tsc --noEmit` in the admin client's build script
       # (wired in package.json), but run it explicitly here too so a TS-only failure is flagged
       # distinctly from a webpack bundle failure.
       - name: Type-check admin client
-        working-directory: src/KenticoSentinel.XbyK.Admin/Client
+        working-directory: src/XperienceCommunity.Sentinel.Admin/Client
         run: npx tsc --noEmit
 
       - name: Test
@@ -75,7 +75,7 @@ jobs:
         # the flag, TRX lands under `<project>/TestResults/` only when run from the project dir;
         # from the solution root it can end up under `<cwd>/TestResults/` and the artifact upload
         # below would miss it.
-        run: dotnet test KenticoSentinel.slnx --configuration Release --no-build --verbosity minimal --logger "trx;LogFileName=test-results.trx" --results-directory tests/KenticoSentinel.Tests/TestResults
+        run: dotnet test XperienceCommunity.Sentinel.slnx --configuration Release --no-build --verbosity minimal --logger "trx;LogFileName=test-results.trx" --results-directory tests/XperienceCommunity.Sentinel.Tests/TestResults
 
       # Upload test results so a reviewer can pull TRX output from a failed run. We don't
       # ship the webpack bundle here — the release workflow handles packaging, and the admin
@@ -85,5 +85,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: tests/KenticoSentinel.Tests/TestResults/
+          path: tests/XperienceCommunity.Sentinel.Tests/TestResults/
           retention-days: 7

@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>XperienceCommunity.Sentinel</RootNamespace>
+    <AssemblyName>sentinel</AssemblyName>
+
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>sentinel</ToolCommandName>
+    <PackageId>XperienceCommunity.Sentinel</PackageId>
+    <Version>0.4.5-alpha</Version>
+    <Authors>Refined Element</Authors>
+    <Company>Refined Element</Company>
+    <Description>Sentinel for Xperience by Kentico — a free, open-source health scanner CLI for XbyK projects (29+). Reports config smells, middleware-order bugs, outdated NuGet packages, unused content types, orphaned content items, stale content, broken assets, malformed Page Builder widgets, and recent EventLog errors. The check library is also published as XperienceCommunity.Sentinel.Core for embedding in XbyK sites. Community project — not affiliated with or maintained by Kentico. Does NOT support Kentico Xperience 13 — XbyK only.</Description>
+    <PackageTags>xperience-by-kentico;xbyk;kentico;linter;scanner;health-check;cms</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/refined-element/xperience-community-sentinel</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/refined-element/xperience-community-sentinel</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\XperienceCommunity.Sentinel.Core\XperienceCommunity.Sentinel.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.6" />
+    <PackageReference Include="Spectre.Console.Cli" Version="0.55.0" />
+  </ItemGroup>
+
+</Project>

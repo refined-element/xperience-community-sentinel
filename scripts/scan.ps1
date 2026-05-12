@@ -1,7 +1,7 @@
 #!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-    Run Kentico Sentinel against an Xperience by Kentico project, auto-resolving the
+    Run Sentinel for Xperience by Kentico against an Xperience by Kentico project, auto-resolving the
     connection string from `dotnet user-secrets`.
 
 .EXAMPLE

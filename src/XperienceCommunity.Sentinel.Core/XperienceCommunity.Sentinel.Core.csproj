@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>XperienceCommunity.Sentinel</RootNamespace>
+    <AssemblyName>XperienceCommunity.Sentinel.Core</AssemblyName>
+
+    <PackageId>XperienceCommunity.Sentinel.Core</PackageId>
+    <Version>0.4.5-alpha</Version>
+    <Authors>Refined Element</Authors>
+    <Company>Refined Element</Company>
+    <Description>Reusable core library for Sentinel for Xperience by Kentico — checks, scan engine, reporting, and quoting. Target any host: CLI, ASP.NET Core background workers, Xperience by Kentico integration, GitHub Actions. Community project — not affiliated with or maintained by Kentico.</Description>
+    <PackageTags>xperience-by-kentico;kentico;sentinel;static-analysis;health-check;library</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/refined-element/xperience-community-sentinel</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/refined-element/xperience-community-sentinel</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.6" />
+    <PackageReference Include="NuGet.Protocol" Version="7.3.1" />
+    <PackageReference Include="Semver" Version="3.0.0" />
+  </ItemGroup>
+
+</Project>

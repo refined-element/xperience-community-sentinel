@@ -1,6 +1,6 @@
-# Contributing to Kentico Sentinel
+# Contributing to Sentinel for Xperience by Kentico
 
-Thanks for considering a contribution! Kentico Sentinel is a free, MIT-licensed health scanner for Xperience by Kentico, maintained by [Refined Element](https://refinedelement.com). We welcome bug reports, rule ideas, UX feedback on the admin UI, new checks, and documentation improvements. Contributions of any size help — a typo fix in the README is just as valuable as a new rule in `KenticoSentinel.Core`.
+Thanks for considering a contribution! Sentinel for Xperience by Kentico is a free, MIT-licensed health scanner for Xperience by Kentico, maintained by [Refined Element](https://refinedelement.com). We welcome bug reports, rule ideas, UX feedback on the admin UI, new checks, and documentation improvements. Contributions of any size help — a typo fix in the README is just as valuable as a new rule in `XperienceCommunity.Sentinel.Core`.
 
 This document describes the workflows that make it easy for us to review and merge your contribution quickly.
 
@@ -21,12 +21,12 @@ All participation in this project is governed by our [Code of Conduct](./CODE_OF
 
 ## Reporting a bug
 
-Please open a [GitHub issue](https://github.com/refined-element/kentico-sentinel/issues/new) and include:
+Please open a [GitHub issue](https://github.com/refined-element/xperience-community-sentinel/issues/new) and include:
 
 - **Repro steps** — the smallest set of actions that reproduces the problem.
 - **Kentico version** — e.g. *Xperience by Kentico 31.0.4*. Include the hotfix if relevant.
 - **Sentinel version** — the NuGet package version (e.g. `0.4.3-alpha`) or CLI version (`sentinel --version`).
-- **Install mode** — embedded NuGet (`KenticoSentinel.XbyK` / `.Admin`) or CLI global tool.
+- **Install mode** — embedded NuGet (`XperienceCommunity.Sentinel.Module` / `.Admin`) or CLI global tool.
 - **Scan output** — the relevant portion of the HTML or JSON report, or the scheduled-task log. If the scan threw, the stack trace from `CMS_EventLog` or stdout.
 - **Expected vs actual** — what you thought would happen, and what actually happened.
 
@@ -38,10 +38,10 @@ New rule ideas are one of the most valuable contributions. Open an issue with th
 
 - **What problem it detects** — the concrete bad state in a Kentico site you want Sentinel to catch.
 - **Why it matters** — performance, security, content-model debt, upgrade blocker, cost, DX, etc.
-- **Proposed severity tier** — `Info`, `Warning`, or `Error`. (See `src/KenticoSentinel.Core/Core/Severity.cs`.)
+- **Proposed severity tier** — `Info`, `Warning`, or `Error`. (See `src/XperienceCommunity.Sentinel.Core/Core/Severity.cs`.)
 - **How it can be detected** — a SQL query against `CMS_*` tables, a file-system check on the source tree, a configuration inspection, etc. A rough sketch is fine; we'll refine during review.
 
-Because the `Core` package is deliberately host-agnostic (no dependency on Kentico assemblies), most new rules are a **single-file PR** — a class in `src/KenticoSentinel.Core/Checks/<Category>/` plus a registration line and a test. That makes rule contributions very accessible.
+Because the `Core` package is deliberately host-agnostic (no dependency on Kentico assemblies), most new rules are a **single-file PR** — a class in `src/XperienceCommunity.Sentinel.Core/Checks/<Category>/` plus a registration line and a test. That makes rule contributions very accessible.
 
 ## Submitting a pull request
 
@@ -67,7 +67,7 @@ Because the `Core` package is deliberately host-agnostic (no dependency on Kenti
 
    First line under ~72 chars. Body is optional but welcome for non-trivial changes — explain *why*, not *what*.
 
-4. **Tests are required** for new rules and bug fixes. Every `ICheck` in `Core` has a matching test in `tests/KenticoSentinel.Tests/` that exercises at least one positive case (finding produced) and one negative case (clean database, no finding). For bug fixes, add a test that fails on `main` and passes on your branch.
+4. **Tests are required** for new rules and bug fixes. Every `ICheck` in `Core` has a matching test in `tests/XperienceCommunity.Sentinel.Tests/` that exercises at least one positive case (finding produced) and one negative case (clean database, no finding). For bug fixes, add a test that fails on `main` and passes on your branch.
 
 5. **Run the full test suite** before pushing:
 
@@ -84,19 +84,19 @@ Because the `Core` package is deliberately host-agnostic (no dependency on Kenti
 
 ## Adding a new check
 
-Checks live in `src/KenticoSentinel.Core/Checks/` organized by category (`Configuration/`, `Content/`, `Dependencies/`). Each check:
+Checks live in `src/XperienceCommunity.Sentinel.Core/Checks/` organized by category (`Configuration/`, `Content/`, `Dependencies/`). Each check:
 
-- Implements [`ICheck`](src/KenticoSentinel.Core/Core/ICheck.cs).
+- Implements [`ICheck`](src/XperienceCommunity.Sentinel.Core/Core/ICheck.cs).
 - Has a **stable rule ID** (e.g. `CNT004`) that is never reused or renumbered once published.
-- Is **registered** in `src/KenticoSentinel.Core/Core/CheckRegistry.cs`.
-- Has at least one test in `tests/KenticoSentinel.Tests/`.
+- Is **registered** in `src/XperienceCommunity.Sentinel.Core/Core/CheckRegistry.cs`.
+- Has at least one test in `tests/XperienceCommunity.Sentinel.Tests/`.
 
 Minimal shape:
 
 ```csharp
-using RefinedElement.Kentico.Sentinel.Core;
+using XperienceCommunity.Sentinel.Core;
 
-namespace RefinedElement.Kentico.Sentinel.Checks.Content;
+namespace XperienceCommunity.Sentinel.Checks.Content;
 
 /// <summary>
 /// CNT004 — short sentence describing what this rule detects and why it matters.
@@ -149,7 +149,7 @@ sentinel scan --connection "Server=.;Database=Xperience;Trusted_Connection=True;
 
 The `scripts/dev-reinstall.ps1` helper packs the CLI project and reinstalls it as a global tool so `sentinel` on your `PATH` points at your in-progress build. Re-run it after any change to the CLI project.
 
-For the embedded NuGet (`KenticoSentinel.XbyK` / `.Admin`), build the solution and reference the local `.nupkg` files from a test Kentico app, or use a local NuGet source.
+For the embedded NuGet (`XperienceCommunity.Sentinel.Module` / `.Admin`), build the solution and reference the local `.nupkg` files from a test Kentico app, or use a local NuGet source.
 
 ## Review and merge expectations
 
@@ -160,8 +160,8 @@ For the embedded NuGet (`KenticoSentinel.XbyK` / `.Admin`), build the solution a
 
 ## Questions
 
-- **Bug or rule idea:** [open an issue](https://github.com/refined-element/kentico-sentinel/issues).
+- **Bug or rule idea:** [open an issue](https://github.com/refined-element/xperience-community-sentinel/issues).
 - **Maintainer contact:** `support@refinedelement.com`.
 - **Project home:** [refinedelement.com](https://refinedelement.com).
 
-Thank you for contributing to Kentico Sentinel.
+Thank you for contributing to Sentinel for Xperience by Kentico.
