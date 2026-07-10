@@ -203,7 +203,7 @@ output like:
 │ Repo                     │ F:\RefinedElement\re-xbk │
 │ Runtime checks           │ enabled                  │
 │ Duration                 │ 3.25s                    │
-│ Checks executed          │ 10                       │
+│ Checks executed          │ 13                       │
 │ Errors                   │ 0                        │
 │ Warnings                 │ 3                        │
 │ Info                     │ 12                       │
@@ -218,27 +218,32 @@ output like:
 
 The HTML report is self-contained (no external CSS/JS) and Refined Element-branded.
 
-## What It Checks (v1)
+## What It Checks
+
+Thirteen checks ship in the default scan — five static (code-only) and eight runtime (database-backed). The CLI and the embedded scheduled task run the same suite, registered in `src/XperienceCommunity.Sentinel.Core/Core/CheckRegistry.cs`.
 
 ### Static — free, no database needed
 
-| # | Check | Why it matters |
-|---|-------|----------------|
-| 1 | **XbyK version** vs. latest, with known CVE flags | Catch security-relevant version drift |
-| 2 | **Outdated NuGet packages** (severity-ranked) | Stay ahead of patch-level risk |
-| 3 | **Config smells** — empty `CMSHashStringSalt`, wrong middleware order, missing Key Vault refs | Prevent subtle prod breakage |
-| 4 | **Duplicate / inconsistent content-type field definitions** | Keep the content model clean |
-| 5 | **Page Builder widgets registered but never placed** | Remove dead code paths |
+| Rule | Check | What it flags |
+|------|-------|---------------|
+| CFG001 | **CMSHashStringSalt configuration** | `CMSHashStringSalt` missing from `appsettings.json` (Error), or hard-coded there instead of supplied via user secrets / Key Vault (Warning) |
+| CFG002 | **Kentico middleware pipeline order** | The `InitKentico → UseStaticFiles → UseKentico` trio out of order or with middleware between the three calls, and `UseWebOptimizer` running before `UseKentico` |
+| CFG003 | **Plaintext secrets in appsettings.json** | String values under sensitive keys (password, secret, apikey, token, …) or connection strings containing `Password=`, unless the value is empty, a placeholder, or a Key Vault reference |
+| DEP001 | **Outdated NuGet packages** | Packages behind their latest version per `dotnet list package --outdated`; a major-version jump is a Warning, minor/patch is Info |
+| VER001 | **Xperience by Kentico version** | The detected XbyK version compared against the latest stable on NuGet; two or more majors behind is an Error, one major behind a Warning |
 
-### Runtime — free, requires DB connection string or Management API credentials
+### Runtime — free, requires a database connection string
 
-| # | Check | Why it matters |
-|---|-------|----------------|
-| 6 | **Unused content types** (0 items) | Find candidates for cleanup |
-| 7 | **Orphaned content items** (0 page or reusable references) | Reclaim the content tree |
-| 8 | **Stale content** (no edits in N days, configurable) | Identify what needs refreshing |
-| 9 | **Broken asset references** | Fix images before users hit them |
-| 10 | **Widgets configured with invalid / missing properties** | Catch dead presentation data |
+| Rule | Check | What it flags |
+|------|-------|---------------|
+| CNT001 | **Unused content types** | Content types with zero content items — candidates for deletion |
+| CNT002 | **Stale unused reusable content** | Reusable content items with no inbound references, untouched past the stale-days threshold (images and files are handled by CNT010 / CNT011) |
+| CNT003 | **Stale content** | Content items not edited within the stale-days window (default 180) |
+| CNT004 | **Broken media file references** | Media files whose library no longer exists, or with a zero-byte size (incomplete upload) |
+| CNT005 | **Malformed Page Builder widget data** | Stored widget configurations that fail to parse as JSON, or widgets with no type identifier |
+| CNT006 | **Recent Kentico EventLog errors** | Errors and warnings in `CMS_EventLog` over the lookback window (default 30 days), grouped by source and event code |
+| CNT010 | **Stale unused images** | Stale, unreferenced image content items — split out from CNT002 for separate triage |
+| CNT011 | **Stale unused documents / files** | Stale, unreferenced file / document content items — split out from CNT002 for separate triage |
 
 ## Output
 
@@ -254,6 +259,15 @@ Every report ends with: *"Want Refined Element to fix these? Run `sentinel quote
 Opt in to richer context with `--include-context` for a more accurate quote.
 
 ## Roadmap
+
+### Planned checks
+
+Check ideas captured but **not yet shipped** — neither is registered in `Core/CheckRegistry.cs` today. Tracked here so the ideas aren't lost:
+
+- **Duplicate / inconsistent content-type field definitions** (static) — flag content types that redefine the same field with a mismatched data type or settings, to keep the content model consistent.
+- **Page Builder widgets registered but never placed** (static) — find widget types compiled and registered in code but not used on any page, so dead widget code can be removed. (Distinct from CNT005, which inspects the widget data already stored on pages.)
+
+### Release plan
 
 **v0.2.x (current alpha)** — embedded-mode NuGet for XbyK 31.x with headless scheduled scanning, custom-table persistence, `CMS_EventLog` mirror, optional HTML email digest. CLI in parity.
 
