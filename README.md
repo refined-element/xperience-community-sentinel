@@ -7,7 +7,7 @@
 Free, open-source. Ships in two forms:
 
 - **Embedded NuGet** for your XbyK site — installs alongside the app, runs on Kentico's scheduler, persists findings to custom tables, mirrors summaries to `CMS_EventLog`. Scans on the default cadence once the admin enables the scheduled task; email digests are opt-in (set `Sentinel:EmailDigest:Recipients`).
-- **CLI tool** for one-shot scans from a terminal or CI — same check suite, HTML + JSON reports, remote GitHub-repo mode.
+- **CLI tool** for one-shot scans from a terminal or CI — the full 13-check suite, including three source-tree checks the embedded host skips (see [What It Checks](#what-it-checks)). HTML + JSON reports, remote GitHub-repo mode.
 
 Built by [Refined Element](https://refinedelement.com) — Kentico Community Leaders 2025 & 2026.
 
@@ -83,7 +83,7 @@ Cadence lives in Kentico's Scheduled Tasks UI — no cron config in code.
 
 - **`XperienceCommunity_SentinelScanRun`** — one row per scan execution (trigger, duration, error/warning/info counts, status)
 - **`XperienceCommunity_SentinelFinding`** — one row per finding with a stable fingerprint for cross-scan acknowledgments
-- **`XperienceCommunity_SentinelFindingAck`** — one row per acknowledged/snoozed finding, keyed by fingerprint. The installer provisions the table so deploys don't need a migration step when the Admin UI (v0.3.x) lights up the ack actions; it stays empty until then.
+- **`XperienceCommunity_SentinelFindingAck`** — one row per acknowledged/snoozed finding, keyed by fingerprint. Written by the Admin UI's acknowledge / snooze actions (section 6); the installer provisions it up front so adding the Admin package later needs no migration step. Stays empty until you use those actions.
 - **`CMS_EventLog`** — summary entry per scan (source = `Sentinel`) + one entry per finding at or above `SeverityThreshold`, up to `EventLogIntegration.MaxEntriesPerScan`; if more findings qualify, Sentinel writes a single additional summary noting the suppressed event-log entries
 
 ### 6. Admin UI (optional)
@@ -194,7 +194,7 @@ the global tool, and leaves you ready to re-run `sentinel`.
 ## What you'll see
 
 A real scan against a production XbyK 31.0.1 site takes about **3 seconds** end-to-end and yields
-output like:
+output like (findings list abridged):
 
 ```
 ╭──────────────────────────┬──────────────────────────╮
@@ -204,23 +204,37 @@ output like:
 │ Runtime checks           │ enabled                  │
 │ Duration                 │ 3.25s                    │
 │ Checks executed          │ 13                       │
+│ Checks skipped (runtime) │ 0                        │
+│ Checks failed            │ 0                        │
 │ Errors                   │ 0                        │
 │ Warnings                 │ 3                        │
 │ Info                     │ 12                       │
 ╰──────────────────────────┴──────────────────────────╯
-  WARNING  CFG003  '_comment_secrets' contains a plaintext secret…  (false-positive — now suppressed)
+  WARNING  CFG003  'Smtp.Password' appears to contain a plaintext secret in appsettings.json.
   WARNING  DEP001  Stripe.net: 50.1.0 → 51.0.0
   WARNING  DEP001  Microsoft.EntityFrameworkCore.SqlServer: 9.0.0 → 10.0.6
-  INFO     CNT001  Content type 'LandingPage' has zero content items.
-  INFO     CNT002  Reusable content item 'Content_TestBlogPost-…' has no inbound references.
-  INFO     VER001  Kentico.Xperience.WebApp is on 31.0.1; latest is 31.4.0.
+  INFO     CNT001  Content type 'Landing page' (ReXBK.LandingPage, Website) has zero content items.
+  INFO     CNT002  'Test blog post' (Article content) — reusable content item with no inbound
+                   references and last edited 312 days ago (threshold: 180 days).
+  INFO     CNT006  Scheduler / EXECUTE: 4 warnings in the last 30 days (first 2026-06-14, latest 2026-07-02).
+  INFO     CNT010  'hero-banner-2023' (Image) — image with no inbound references and last edited
+                   402 days ago (threshold: 180 days).
+  INFO     VER001  Xperience by Kentico Kentico.Xperience.WebApp is on 31.0.1; latest on NuGet is 31.4.0.
+  … plus 7 more Info findings — the full list lands in the HTML / JSON report.
 ```
+
+`Checks executed` counts only checks that actually ran. Run without `--connection-string` and the
+eight runtime checks are skipped: the same site reports `Checks executed 5` / `Checks skipped (runtime) 8`
+— the expected shape for a static-only scan, not a broken install. `Checks failed` counts checks that
+threw an exception; each failure also surfaces as a SYS001 Warning finding so it can't hide.
 
 The HTML report is self-contained (no external CSS/JS) and Refined Element-branded.
 
 ## What It Checks
 
-Thirteen checks ship in the default scan — five static (code-only) and eight runtime (database-backed). The CLI and the embedded scheduled task run the same suite, registered in `src/XperienceCommunity.Sentinel.Core/Core/CheckRegistry.cs`.
+Thirteen checks ship in the default scan — five static (code-only) and eight runtime (database-backed) — all registered in `src/XperienceCommunity.Sentinel.Core/Core/CheckRegistry.cs`.
+
+**Coverage differs by host.** The CLI runs the full suite: all five static checks, plus the eight runtime checks when `--connection-string` is provided. The embedded scheduled task scans the deployed site, where three source-tree checks — **CFG002** (middleware order), **DEP001** (outdated packages), and **VER001** (XbyK version) — skip themselves and report nothing: a deployed site ships compiled DLLs, with no `Program.cs` or `.csproj` to inspect. An embedded scan therefore effectively covers CFG001, CFG003, and the eight runtime checks, minus anything you list in `Sentinel:Checks:Excluded`. For full static coverage — middleware order, package drift, XbyK version — run the CLI against the source repo (for example in CI).
 
 ### Static — free, no database needed
 
@@ -228,22 +242,29 @@ Thirteen checks ship in the default scan — five static (code-only) and eight r
 |------|-------|---------------|
 | CFG001 | **CMSHashStringSalt configuration** | `CMSHashStringSalt` missing from `appsettings.json` (Error), or hard-coded there instead of supplied via user secrets / Key Vault (Warning) |
 | CFG002 | **Kentico middleware pipeline order** | The `InitKentico → UseStaticFiles → UseKentico` trio out of order or with middleware between the three calls, and `UseWebOptimizer` running before `UseKentico` |
-| CFG003 | **Plaintext secrets in appsettings.json** | String values under sensitive keys (password, secret, apikey, token, …) or connection strings containing `Password=`, unless the value is empty, a placeholder, or a Key Vault reference |
-| DEP001 | **Outdated NuGet packages** | Packages behind their latest version per `dotnet list package --outdated`; a major-version jump is a Warning, minor/patch is Info |
+| CFG003 | **Plaintext secrets in appsettings.json** | String values under sensitive-looking keys (password, secret, apikey, token, accesskey, privatekey, …) and connection strings containing `Password=` or `Pwd=`. Exemptions are exact: empty values, values starting with `@Microsoft.KeyVault(`, `$(`, or `${`, and underscore-prefixed keys (the JSON-comment convention). Human-style placeholders such as `CHANGE_ME` or `your-key-here` are still flagged |
+| DEP001 | **Outdated NuGet packages** | Packages behind their latest version per `dotnet list package --outdated`; a major-version jump is a Warning, minor/patch is Info. Prerelease-installed packages — which `dotnet list` reports as "Not found at the sources" — fall back to querying the repo's declared NuGet sources directly with prereleases included |
 | VER001 | **Xperience by Kentico version** | The detected XbyK version compared against the latest stable on NuGet; two or more majors behind is an Error, one major behind a Warning |
+
+CFG002, DEP001, and VER001 run only from the CLI against a source repo — the embedded scheduled task skips them (see above).
 
 ### Runtime — free, requires a database connection string
 
 | Rule | Check | What it flags |
 |------|-------|---------------|
 | CNT001 | **Unused content types** | Content types with zero content items — candidates for deletion |
-| CNT002 | **Stale unused reusable content** | Reusable content items with no inbound references, untouched past the stale-days threshold (images and files are handled by CNT010 / CNT011) |
+| CNT002 | **Stale unused reusable content** | Reusable content items with no inbound references, untouched past the stale-days threshold. Excludes content types whose name matches the CNT010 / CNT011 patterns, so it never overlaps with either |
 | CNT003 | **Stale content** | Content items not edited within the stale-days window (default 180) |
 | CNT004 | **Broken media file references** | Media files whose library no longer exists, or with a zero-byte size (incomplete upload) |
 | CNT005 | **Malformed Page Builder widget data** | Stored widget configurations that fail to parse as JSON, or widgets with no type identifier |
 | CNT006 | **Recent Kentico EventLog errors** | Errors and warnings in `CMS_EventLog` over the lookback window (default 30 days), grouped by source and event code |
-| CNT010 | **Stale unused images** | Stale, unreferenced image content items — split out from CNT002 for separate triage |
-| CNT011 | **Stale unused documents / files** | Stale, unreferenced file / document content items — split out from CNT002 for separate triage |
+| CNT010 | **Stale unused images** | Stale, unreferenced content items whose content-type *name* looks image-like (contains image / photo / picture / thumbnail) — intentionally a class-name heuristic; split out from CNT002 for separate triage |
+| CNT011 | **Stale unused documents / files** | Stale, unreferenced content items whose content-type *name* looks file-like (contains file / document / pdf / attachment / media) — the same class-name heuristic; split out from CNT002 for separate triage |
+
+CNT002 / CNT010 / CNT011 share one query and differ only in the content-type name predicate. Two behaviors to know:
+
+- **Staleness:** an item is flagged when its most recent language-metadata edit is older than the stale-days threshold (default 180) — **or when it has no language-metadata rows at all**, in which case it's flagged immediately regardless of age (the finding reads "no modifications recorded").
+- **Bucketing is by class *name*, and CNT010/CNT011 can overlap:** CNT002's predicate excludes both the image and the file name patterns, so it never overlaps the other two. CNT010 and CNT011 do **not** exclude each other — a content type whose name matches both pattern sets (e.g. `MediaImage` matches `%image%` and `%media%`) reports the same item under **both** rules. And because the match is a name heuristic, a type like `Site.AuthorProfile` (contains "file") lands in CNT011 while an image type named `Visual` falls through to CNT002. If a bucket is noisy for your naming convention, exclude that rule via `Sentinel:Checks:Excluded`.
 
 ## Output
 
@@ -265,13 +286,19 @@ Opt in to richer context with `--include-context` for a more accurate quote.
 Check ideas captured but **not yet shipped** — neither is registered in `Core/CheckRegistry.cs` today. Tracked here so the ideas aren't lost:
 
 - **Duplicate / inconsistent content-type field definitions** (static) — flag content types that redefine the same field with a mismatched data type or settings, to keep the content model consistent.
-- **Page Builder widgets registered but never placed** (static) — find widget types compiled and registered in code but not used on any page, so dead widget code can be removed. (Distinct from CNT005, which inspects the widget data already stored on pages.)
+- **Page Builder widgets registered but never placed** (runtime) — find widget types compiled and registered in code but absent from every page's stored widget data, so dead widget code can be removed. Placement lives in the database (`CMS_ContentItemCommonData` — the same data CNT005 inspects), so this needs a connection string; it can't be a static-only check.
+
+### Known behavior notes / follow-ups
+
+Shipped-behavior quirks worth knowing — documented here rather than silently absorbed above, and candidates for future refinement:
+
+- **CNT010 / CNT011 can double-report:** the two name-pattern predicates don't exclude each other, so a content type matching both (e.g. `MediaImage`) fires the same item under both rules — two findings, two ack fingerprints. Several code comments claim all three rules are mutually exclusive; only CNT002's exclusion actually is. Fix candidate: subtract the image patterns from CNT011's predicate.
+- **No-metadata items are flagged immediately:** the shared CNT002/CNT010/CNT011 query flags unreferenced items with no language-metadata rows regardless of age (the `MAX(...) IS NULL` branch). Right for genuinely abandoned items, but freshly migrated content whose metadata hasn't landed yet can appear "stale" on day one. Fix candidate: a distinct message (or severity) for the no-metadata case.
+- **Embedded host has a static-coverage gap:** CFG002 / DEP001 / VER001 no-op in embedded scans (by design — no source tree on a deployed site), so middleware order, package drift, and XbyK version drift are only caught by CLI runs. Fix candidates: surface "needs the CLI" in the admin dashboard instead of silence, and/or a documented CI recipe.
 
 ### Release plan
 
-**v0.2.x (current alpha)** — embedded-mode NuGet for XbyK 31.x with headless scheduled scanning, custom-table persistence, `CMS_EventLog` mirror, optional HTML email digest. CLI in parity.
-
-**v0.3.x (next alpha)** — admin UI module: Scan history + Findings listing pages, then custom Dashboard + Contact Refined Element form. Separate `…XbyK.Admin` NuGet so headless deploys can skip it.
+**v0.4.x (current alpha)** — everything documented above is shipped: the embedded module (`XperienceCommunity.Sentinel.Module`) with headless scheduled scanning, custom-table persistence, `CMS_EventLog` mirror, and opt-in email digest; the admin UI (`XperienceCommunity.Sentinel.Admin`) with Dashboard, Scan history, Findings, Scan detail (acknowledge / snooze / revoke), Compare scans, Request-a-quote, and DB-backed editable Settings; and the CLI with GitHub-repo mode. (Historical: v0.2.x delivered the embedded module, v0.3.x the admin UI.)
 
 **v1.x (stable)** — API freeze. Same feature surface, no more breaking changes between minor versions. Free, MIT-licensed.
 
