@@ -19,6 +19,7 @@ if (-not (Test-Json -Json $json -SchemaFile $SchemaPath -ErrorAction SilentlyCon
 
 $doc = $json | ConvertFrom-Json
 $deduction = @{ Critical = 25; High = 10; Medium = 4; Low = 1 }
+$perRuleCap = @{ Medium = 12; Low = 5 }
 function Get-Grade([int] $score) {
     if ($score -ge 90) { 'A' } elseif ($score -ge 80) { 'B' } elseif ($score -ge 70) { 'C' } elseif ($score -ge 60) { 'D' } else { 'F' }
 }
@@ -27,9 +28,23 @@ $failed = $false
 $scores = @{}
 foreach ($dim in 'architecture', 'contentModel', 'security', 'performance') {
     $score = 100
-    foreach ($f in $doc.findings | Where-Object { $_.dimension -eq $dim }) {
+    $dimFindings = $doc.findings | Where-Object { $_.dimension -eq $dim }
+
+    # Critical and High: linear, uncapped — every finding counts in full.
+    foreach ($f in $dimFindings | Where-Object { $_.severity -eq 'Critical' -or $_.severity -eq 'High' }) {
         $score -= $deduction[$f.severity]
     }
+
+    # Medium and Low: grouped per rule ID (finding.id), capped per rule ID.
+    foreach ($severity in 'Medium', 'Low') {
+        $bySeverity = $dimFindings | Where-Object { $_.severity -eq $severity }
+        $byRule = $bySeverity | Group-Object -Property id
+        foreach ($ruleGroup in $byRule) {
+            $ruleDeduction = [Math]::Min($ruleGroup.Count * $deduction[$severity], $perRuleCap[$severity])
+            $score -= $ruleDeduction
+        }
+    }
+
     $score = [Math]::Max(0, $score)
     $scores[$dim] = $score
     $declared = $doc.grades.dimensions.$dim

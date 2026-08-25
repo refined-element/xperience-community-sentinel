@@ -5,10 +5,10 @@
   "sentinel": { "version": "0.4.5-alpha", "runtimeEnabled": true },
   "target": { "repoPath": "F:/example/site", "xbykVersion": "31.7.3" },
   "grades": {
-    "overall": 98,
+    "overall": 96,
     "dimensions": {
       "architecture": { "score": 100, "grade": "A" },
-      "contentModel": { "score": 100, "grade": "A" },
+      "contentModel": { "score": 95, "grade": "A" },
       "security": { "score": 90, "grade": "A" },
       "performance": { "score": 100, "grade": "A" }
     }
@@ -27,6 +27,97 @@
       "effort": "S",
       "fixable": "auto",
       "references": ["https://learn.microsoft.com/aspnet/core/security/enforcing-ssl"]
+    },
+    {
+      "id": "CNT003",
+      "instanceKey": "edcd500f4a051a1d206d09c9b300d11db8dcc95e47d2b9c17d1aa44d27d1a6d8",
+      "source": "sentinel",
+      "dimension": "contentModel",
+      "severity": "Low",
+      "title": "Stale content",
+      "message": "'Spring Product Launch' (ArticlePage) has not been edited in 201 days (threshold: 180).",
+      "location": "CMS_ContentItem.ContentItemID=201",
+      "remediation": "Review and refresh, or mark intentionally evergreen. Paid tier can draft updates automatically from analytics signals.",
+      "effort": "M",
+      "fixable": "manual"
+    },
+    {
+      "id": "CNT003",
+      "instanceKey": "c63a4a5d6a8bbce6bf117364d250845c47d24cc3e4070e4cfc8c764c49c4ecc2",
+      "source": "sentinel",
+      "dimension": "contentModel",
+      "severity": "Low",
+      "title": "Stale content",
+      "message": "'Q1 Roadmap Update' (ArticlePage) has not been edited in 202 days (threshold: 180).",
+      "location": "CMS_ContentItem.ContentItemID=202",
+      "remediation": "Review and refresh, or mark intentionally evergreen. Paid tier can draft updates automatically from analytics signals.",
+      "effort": "M",
+      "fixable": "manual"
+    },
+    {
+      "id": "CNT003",
+      "instanceKey": "d5ba2d075e86e015a22aa30bf5ed43139fa4b2444bbd06e4302ab5ae962211ce",
+      "source": "sentinel",
+      "dimension": "contentModel",
+      "severity": "Low",
+      "title": "Stale content",
+      "message": "'Customer Success Story: Acme Corp' (ArticlePage) has not been edited in 203 days (threshold: 180).",
+      "location": "CMS_ContentItem.ContentItemID=203",
+      "remediation": "Review and refresh, or mark intentionally evergreen. Paid tier can draft updates automatically from analytics signals.",
+      "effort": "M",
+      "fixable": "manual"
+    },
+    {
+      "id": "CNT003",
+      "instanceKey": "4298019e56a17b59b76bc3bb6e9c51f3b55b8c8585f8c5468baa2b50fea142b4",
+      "source": "sentinel",
+      "dimension": "contentModel",
+      "severity": "Low",
+      "title": "Stale content",
+      "message": "'Content ArchivedPromoBanner' (BannerContent) has not been edited in 204 days (threshold: 180).",
+      "location": "CMS_ContentItem.ContentItemID=204",
+      "remediation": "Review and refresh, or mark intentionally evergreen. Paid tier can draft updates automatically from analytics signals.",
+      "effort": "M",
+      "fixable": "manual"
+    },
+    {
+      "id": "CNT003",
+      "instanceKey": "54eb774c46eb3b9e4248358583ace7155dead3caad11a4d6cbfb46745bf34e4f",
+      "source": "sentinel",
+      "dimension": "contentModel",
+      "severity": "Low",
+      "title": "Stale content",
+      "message": "'Legacy Onboarding Guide' (ArticlePage) has not been edited in 205 days (threshold: 180).",
+      "location": "CMS_ContentItem.ContentItemID=205",
+      "remediation": "Review and refresh, or mark intentionally evergreen. Paid tier can draft updates automatically from analytics signals.",
+      "effort": "M",
+      "fixable": "manual"
+    },
+    {
+      "id": "CNT003",
+      "instanceKey": "170e63564cc514812d278e6cb6f257c8f75fd778fb638312dba3327668e63d9f",
+      "source": "sentinel",
+      "dimension": "contentModel",
+      "severity": "Low",
+      "title": "Stale content",
+      "message": "'Content DiscontinuedFeatureBanner' (BannerContent) has not been edited in 206 days (threshold: 180).",
+      "location": "CMS_ContentItem.ContentItemID=206",
+      "remediation": "Review and refresh, or mark intentionally evergreen. Paid tier can draft updates automatically from analytics signals.",
+      "effort": "M",
+      "fixable": "manual"
+    },
+    {
+      "id": "CNT003",
+      "instanceKey": "c8afa97aa1b307dd6fd64d21ca3ffac4ba427bc3885056b01302efe31b8ef2cd",
+      "source": "sentinel",
+      "dimension": "contentModel",
+      "severity": "Low",
+      "title": "Stale content",
+      "message": "'Winter Release Notes' (ArticlePage) has not been edited in 207 days (threshold: 180).",
+      "location": "CMS_ContentItem.ContentItemID=207",
+      "remediation": "Review and refresh, or mark intentionally evergreen. Paid tier can draft updates automatically from analytics signals.",
+      "effort": "M",
+      "fixable": "manual"
     }
   ]
 }

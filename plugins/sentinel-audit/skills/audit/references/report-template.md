@@ -297,10 +297,13 @@ State, in prose:
   check cites) live in that finding's `references` array and belong in its
   remediation text, not in this section.
 - **Grading formula summary.** One short paragraph restating `grading.md`'s
-  formula: each dimension starts at 100, loses 25 points per Critical finding,
-  10 per High, 4 per Medium, and 1 per Low, floored at 0; scores convert to
-  letter grades at 90/80/70/60; the overall score is the unweighted mean of the
-  four dimension scores, rounded half-up.
+  formula: each dimension starts at 100, loses 25 points per Critical finding
+  and 10 per High finding (both uncapped), and loses 4 points per Medium
+  finding and 1 point per Low finding grouped and capped per rule ID (12
+  points per Medium rule, 5 points per Low rule) so high-volume hygiene
+  findings from one rule can't outweigh real defects, all floored at 0; scores
+  convert to letter grades at 90/80/70/60; the overall score is the unweighted
+  mean of the four dimension scores, rounded half-up.
 - **Unmapped-rule appendix.** For every Sentinel finding whose rule ID isn't in
   `grading.md`'s dimension-mapping table, state the rule ID, that it was
   defaulted to the Architecture & configuration dimension per that table's

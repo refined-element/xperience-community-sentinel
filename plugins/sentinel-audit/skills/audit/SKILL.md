@@ -275,7 +275,10 @@ table before you write any file:
 |---|---|---|---|---|---|---|---|
 | Architecture & configuration | 0 | 2 | 1 | 0 | 24 | 76 | C |
 
-(The row is an illustration. Use the real counts.)
+(The row is an illustration. Use the real counts.) The Medium and Low columns are raw counts;
+`grading.md`'s formula groups those counts by rule ID and caps the deduction per rule before it
+feeds the Deduction column — don't multiply the raw count by 4 or 1 directly when a rule fired more
+than a few times.
 
 Then state the overall score — the unweighted mean of the four dimension scores, rounded half-up —
 and its letter grade.

@@ -58,25 +58,39 @@ AI-sourced findings (`source: "ai"`) don't need this table — each check in `ar
 Compute each dimension's score independently:
 
 1. Start the dimension at 100.
-2. For every finding assigned to that dimension, subtract a deduction based on its unified severity: Critical 25, High 10, Medium 4, Low 1.
-3. Floor the result at 0 — a dimension score never goes negative.
-4. Convert the floored score to a letter grade: A for 90 or above, B for 80 or above, C for 70 or above, D for 60 or above, F for anything below 60.
+2. For every Critical finding assigned to that dimension, subtract 25; for every High finding, subtract 10. Both are uncapped — every Critical and every High finding counts in full, because a real defect never gets cheaper by recurring.
+3. For Medium and Low findings, group the dimension's findings of that severity by rule ID (the finding's `id`), then subtract a per-rule deduction: Medium is 4 points per finding in the group, **capped at 12 points per rule ID**; Low is 1 point per finding in the group, **capped at 5 points per rule ID**. Sum the (possibly capped) per-rule deductions across all rule IDs of that severity to get the severity's total deduction for the dimension.
+4. Floor the result at 0 — a dimension score never goes negative.
+5. Convert the floored score to a letter grade: A for 90 or above, B for 80 or above, C for 70 or above, D for 60 or above, F for anything below 60.
 
-Compute the overall score as the unweighted mean of the four dimension scores (`architecture`, `contentModel`, `security`, `performance`), rounded half-up — ties round away from zero — to the nearest integer. Convert the overall score to a letter grade using the same bands as step 4.
+The caps exist because instance-linear scoring let hygiene volume (38 instances of one Info-level rule) bury the story real defects tell — a single noisy Low or Medium rule could sink a dimension's grade as hard as a handful of genuine High findings, which misrepresents where the risk actually is.
+
+Compute the overall score as the unweighted mean of the four dimension scores (`architecture`, `contentModel`, `security`, `performance`), rounded half-up — ties round away from zero — to the nearest integer. Convert the overall score to a letter grade using the same bands as step 5.
 
 ### Worked example
 
-The security dimension has 1 Critical, 2 High, 3 Medium, and 4 Low findings:
+The security dimension has 1 Critical, 2 High, 3 Medium, and 4 Low findings. All 3 Medium findings share one rule ID, and all 4 Low findings share one (different) rule ID:
 
 ```
-100 − 25 (1 × 25, Critical)
-    − 20 (2 × 10, High)
-    − 12 (3 × 4, Medium)
-    −  4 (4 × 1, Low)
+100 − 25 (1 × 25, Critical — uncapped)
+    − 20 (2 × 10, High — uncapped)
+    − 12 (min(3 × 4, 12), Medium — one rule ID, at the cap)
+    −  4 (min(4 × 1, 5), Low — one rule ID, under the cap)
 = 39
 ```
 
-39 is below 60, so the security dimension scores 39 and grades **F**.
+39 is below 60, so the security dimension scores 39 and grades **F** — the same result as before the caps existed, because neither the Medium nor the Low group actually exceeds its cap here (3 × 4 = 12 lands exactly on the cap; 4 × 1 = 4 sits under the cap of 5).
+
+### Worked example: the cap biting
+
+The content model dimension has 38 Low findings, all from the same rule ID (for example, `CNT003` flagging 38 separate stale content items) and nothing else:
+
+```
+100 − 5 (min(38 × 1, 5), Low — one rule ID, capped)
+= 95
+```
+
+Uncapped, 38 findings at 1 point each would have deducted 38 points (a score of 62, grade D). Capped per rule ID, the deduction is 5 points regardless of how many instances of that one rule fired, so the dimension scores 95 and grades **A**. This is the caps' intended effect: high-volume hygiene findings from a single rule no longer dominate a dimension's score the way a handful of genuine Critical or High defects would.
 
 ## instanceKey recipe
 
