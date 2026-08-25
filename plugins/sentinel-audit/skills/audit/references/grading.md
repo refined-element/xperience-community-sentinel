@@ -43,10 +43,13 @@ Every finding belongs to exactly one dimension: `architecture`, `contentModel`, 
 | `CFG003` and any secret-related config rule | security |
 | Other `CFG` rules (middleware order, salt configuration) | architecture |
 | Widget-registration rules (registered but never placed) | architecture |
-| Content-type/field rules, `CNT001`, `CNT002`, broken assets, widget property rules | contentModel |
+| Content-type/field rules and every `CNT`-prefixed rule — unused content types, unused and stale content items, stale content, broken assets, widget property data, and the EventLog rule that shares the prefix | contentModel |
+| `SYS`-prefixed rules (Sentinel internals — a Sentinel check that threw during the scan) | *(none)* — excluded from grading; report in the Methodology section as a check that didn't execute |
 | *(unmapped/new Sentinel rules)* | architecture (default) — flag in the report appendix |
 
 When a Sentinel rule doesn't appear in this table, assign it to `architecture` and add a note in the report's Methodology appendix identifying the unmapped rule ID so the mapping table can be extended later.
+
+`SYS`-prefixed rules are the one exception to that default. They describe a failure in the scanner rather than a defect in the audited project, so they never enter the graded set, never receive a dimension, and never appear in `audit-findings.json`. The report accounts for them in Methodology as missing coverage instead.
 
 AI-sourced findings (`source: "ai"`) don't need this table — each check in `architecture-config.md`, `content-model.md`, `security.md`, and `performance.md` already declares its own dimension by which reference file it lives in.
 

@@ -16,8 +16,11 @@ pass, merge both sources into one graded findings set, and write three files to
 | `audit-report.md` | The human-readable report. |
 | `audit-report.html` | The same report as a self-contained page styled to match Sentinel's own scan report. |
 
-Everything runs locally. The only network calls are the Sentinel CLI install and documentation
-lookups. Nothing is sent to Refined Element unless the user runs `sentinel quote` themselves.
+Everything runs locally. Three things reach the network: the Sentinel CLI install, the package and
+version metadata lookups the scan makes against nuget.org for its `VER001` and `DEP001` rules
+(those send package identifiers and nothing else), and documentation lookups during the AI pass.
+Nothing about the code or the findings leaves the machine unless the user runs `sentinel quote`
+themselves.
 
 ## Reference files
 
@@ -124,10 +127,15 @@ produce identical finding IDs, severities, and grades.
 2. Execute every check in every file against `<target>`. Fire a finding only when the check's
    "Pass when" criteria objectively fail. Ambiguous evidence never fires a finding — carry it into
    the dimension's narrative as a stated uncertainty instead, per `grading.md`'s determinism rule.
-3. Honor each check's evidence split. Where a check separates a repo-only criterion from an
-   environment-dependent part, only the repo-only criterion can fire the finding; report the
-   environment-dependent part as "unverified" in the narrative. The checks in `performance.md`
-   carry no such split — each one is evaluable from the repository alone.
+3. Honor each check's evidence split, and fire on the basis the check names for itself. Where a
+   check separates a repo-only criterion from an environment-dependent part, the
+   environment-dependent part never fires the finding alone — report it as "unverified" in the
+   narrative. Most such checks name the repo-only criterion as "the only basis for firing this
+   check"; where a check names a different firing basis, follow that check. `AUD-ARC-010` is the
+   one that differs today: its repo-only criterion records the package version and target framework
+   and "never fails on its own," so the finding fires only when the live support-lifecycle lookup
+   succeeds and shows the version or target framework is outside its supported window. The checks
+   in `performance.md` carry no split — each one is evaluable from the repository alone.
 4. Take `severity`, `effort`, and `fixable` from the check's own locked defaults. Escalate the
    severity only when the evidence clearly warrants it, and say why in the finding's `message`.
    Never de-escalate below the default.
@@ -155,7 +163,15 @@ produce identical finding IDs, severities, and grades.
 
 ### 4.1 Convert the Sentinel findings
 
-Build a unified finding from each entry in `report.json`'s `findings` array:
+First, drop every finding whose `category` is `Sentinel Internals` — the `SYS`-prefixed rules,
+currently `SYS001` "Check failed to execute". Those record a Sentinel check that threw an exception
+during the scan: a tool failure, not a defect in the audited project. Never grade a `SYS` finding
+and never write one into `audit-findings.json`. Name each one in the report's Methodology section
+instead, as a check that didn't execute, so the report states plainly which coverage is missing.
+`report.json`'s `executions` array carries the same event with `status: "Failed"` and the exception
+message.
+
+Build a unified finding from each remaining entry in `report.json`'s `findings` array:
 
 - `id` = `ruleId`, `source` = `"sentinel"`, `title` = `ruleTitle`, `message` = `message`,
   `location` = `location` (`null` when absent).
@@ -187,7 +203,8 @@ Build a unified finding from each entry in `report.json`'s `findings` array:
   | Any other rule | — | M | manual |
 
   Record every rule that fell through to the last row next to the unmapped-dimension list, and
-  name both in the Methodology appendix.
+  name both in the Methodology appendix. `SYS`-prefixed rules never reach this table — they were
+  dropped above.
 
 ### 4.2 Deduplicate: one defect scores once
 
@@ -205,24 +222,33 @@ whole rule; the rule is same defect, same location.
 | `AUD-ARC-001` | `CFG002` | Kentico middleware trio ordering |
 | `AUD-SEC-001` | `CFG003` | A plaintext secret in the same tracked file |
 | `AUD-SEC-002` | `CFG001` | `CMSHashStringSalt` configuration |
-| `AUD-SEC-010` | `VER001`, `DEP001` | The same package at the same version |
+| `AUD-SEC-010` | `VER001`, `DEP001` | The same package, and only when the Sentinel finding carries the vulnerability signal itself |
 | `AUD-CM-005` | `CNT001` | The same unused content type |
+
+The `AUD-SEC-010` row is narrower than the others on purpose. `AUD-SEC-010` fires on a known
+vulnerability; `VER001` and `DEP001` fire on version currency. Those are different defects, so
+deduplicate that pair only when the Sentinel finding names the vulnerability for that same package.
+When Sentinel reports a package as outdated and the AI check reports it as vulnerable, keep both
+findings — a package can be outdated without being vulnerable, and vulnerable without being
+outdated.
 
 The two findings in a pair can sit in different dimensions — `AUD-SEC-002` is `security` and
 `CFG001` is `architecture` — so keeping the Sentinel finding moves the deduction to the Sentinel
 finding's dimension. Say so in both dimension narratives when it happens.
 
 **Across AI dimensions.** When two AI checks would fire on one piece of evidence, fire only the
-check whose dimension owns that evidence, following the checklists' own cross-reference notes:
+check whose dimension owns that evidence:
 
-| Evidence | Fires | Stands down |
-|---|---|---|
-| Cache dependency correctness on a content query | `AUD-ARC-003` | `AUD-PRF-002`, which then fires only on its own caching-coverage and duration criteria |
-| Unbounded or oversized `WithLinkedItems` depth | `AUD-CM-006` | `AUD-PRF-003`, which then fires only on a missing column projection or a missing `TopN` bound |
+| Evidence | Fires | Stands down | Resolved by |
+|---|---|---|---|
+| Cache dependency correctness on a content query | `AUD-ARC-003` | `AUD-PRF-002`, which then fires only on its own caching-coverage and duration criteria | `AUD-PRF-002`'s own cross-reference note in `performance.md` |
+| Unbounded or oversized `WithLinkedItems` depth | `AUD-CM-006` | `AUD-PRF-003`, which then fires only on a missing column projection or a missing `TopN` bound | The tie-break ladder below — neither checklist carries a note for this pair |
 
-When the checklists carry no note for an overlap, fire the check whose "Pass when" criteria match
-the evidence more narrowly. When that still ties, fire the check from the file that comes first in
-the step 3 evaluation order.
+Where a checklist carries a cross-reference note for an overlap, follow the note. Where none
+exists, fire the check whose "Pass when" criteria match the evidence more narrowly; when that still
+ties, fire the check from the file that comes first in the step 3 evaluation order. The ladder is
+what settles row 2: `AUD-CM-006`'s criteria are entirely about linked-item depth, while
+`AUD-PRF-003` bundles depth with column projection and row bounds, so the narrower match wins.
 
 ### 4.3 Compute each instanceKey
 
@@ -254,10 +280,10 @@ table before you write any file:
 Then state the overall score — the unweighted mean of the four dimension scores, rounded half-up —
 and its letter grade.
 
-`findings-schema.json` stores `grades.overall` as an integer score with no letter beside it, while
-the Scorecard needs both. Derive the overall letter from the stored score with the same bands
-(90/80/70/60) and leave the JSON as the schema defines it: adding a letter field there fails
-validation.
+`findings-schema.json` stores `grades.overall` as an integer score with no letter beside it, and
+`report-template.md`'s Scorecard section says to derive the Overall row's letter from that score
+with the same bands (90/80/70/60). Leave the JSON as the schema defines it: adding a letter field
+there fails validation.
 
 ## 5. Write the deliverables
 

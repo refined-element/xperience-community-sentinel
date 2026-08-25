@@ -190,8 +190,10 @@ tracked configuration file") instead of naming the rule that caught it.
 ### Scorecard
 
 One table: the four dimensions in the display-name order above, each with its
-score and letter grade, plus an Overall row. Values come from
-`grades.dimensions.<key>.{score,grade}` and `grades.overall.{score,grade}`.
+score and letter grade, plus an Overall row. Dimension values come from
+`grades.dimensions.<key>.{score,grade}`. The Overall row's score comes from
+`grades.overall`, which `findings-schema.json` types as a bare integer; derive
+its letter from that score using `grading.md`'s 90/80/70/60 bands.
 
 ```markdown
 | Dimension | Score | Grade |
