@@ -63,43 +63,13 @@ Content model scores 79, a C. The shape of the model is right: shared entities s
 | AUD-CM-003 | Medium | FAQ grouping uses a free-text field | M | assisted |
 | AUD-CM-008 | Medium | Widgets store structured content in their properties | L | manual |
 | AUD-CM-004 | Low | Admin content-creation endpoint files items at the workspace root | M | manual |
-| CNT001 | Low | Unused content types | S | assisted |
-| CNT001 | Low | Unused content types | S | assisted |
+| CNT001 | Low | Unused content types (a couple of findings) | S | assisted |
 | CNT002 | Low | Stale unused reusable content | S | assisted |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
-| CNT003 | Low | Stale content | M | manual |
+| CNT003 | Low | Stale content (more than 30 findings) | M | manual |
 
 ## Security
 
-Security scores 32, an F, and is the dimension to address first. Five High findings come from the review and nineteen dependency findings from the scan. The most exposed of the five is unsanitized output: the project ships a configured HTML sanitizer, but no view calls it, so rich text an editor types in the content hub renders straight into pages - including one field emitted verbatim as embed markup and several interpolated into a structured-data script block. Next, the shopping-cart controller changes server-side state on four POST actions with no anti-forgery token and no documented exemption; no version of ASP.NET Core validates a controller action automatically. The public catalog API that AI agents call, and another public endpoint that makes an outbound third-party call on every anonymous request, both run with no rate-limiting policy at all. The blog image upload checks only the file extension - not the file's actual content or its name - before storing the upload as a published asset. Finally, one transitive dependency resolves to a version with a Moderate published advisory, which is a different problem from the version-currency findings the scan reports and is counted separately. The rest of the dimension is in good order: no secret is committed in any tracked file, the hash salt key is declared and empty as it should be, no seed script creates a default administrator account, HTTPS redirection and HSTS are wired correctly for their environments, the full set of security response headers is present with a restrictive content security policy, and every credential comparison uses a constant-time check. Two environment-dependent items could not be verified from the repository and are noted in Methodology.
+Security scores 32, an F, and is the dimension to address first. Five High findings come from the review and more than a dozen dependency findings from the scan. The most exposed of the five is unsanitized output: the project ships a configured HTML sanitizer, but no view calls it, so rich text an editor types in the content hub renders straight into pages - including one field emitted verbatim as embed markup and several interpolated into a structured-data script block. Next, the shopping-cart controller changes server-side state on four POST actions with no anti-forgery token and no documented exemption; no version of ASP.NET Core validates a controller action automatically. The public catalog API that AI agents call, and another public endpoint that makes an outbound third-party call on every anonymous request, both run with no rate-limiting policy at all. The blog image upload checks only the file extension - not the file's actual content or its name - before storing the upload as a published asset. Finally, one transitive dependency resolves to a version with a Moderate published advisory, which is a different problem from the version-currency findings the scan reports and is counted separately. The rest of the dimension is in good order: no secret is committed in any tracked file, the hash salt key is declared and empty as it should be, no seed script creates a default administrator account, HTTPS redirection and HSTS are wired correctly for their environments, the full set of security response headers is present with a restrictive content security policy, and every credential comparison uses a constant-time check. Two environment-dependent items could not be verified from the repository and are noted in Methodology.
 
 | ID | Severity | Title | Effort | Fixable |
 |---|---|---|---|---|
@@ -108,23 +78,8 @@ Security scores 32, an F, and is the dimension to address first. Five High findi
 | AUD-SEC-008 | High | Public agent-facing endpoints have no rate limit | M | assisted |
 | AUD-SEC-009 | High | Blog image upload skips content and filename checks | M | assisted |
 | AUD-SEC-010 | High | Transitive OpenTelemetry.Api carries a known advisory | S | auto |
-| DEP001 | Medium | Outdated NuGet packages | S | auto |
-| DEP001 | Medium | Outdated NuGet packages | S | auto |
-| DEP001 | Medium | Outdated NuGet packages | S | auto |
-| DEP001 | Medium | Outdated NuGet packages | S | auto |
-| DEP001 | Medium | Outdated NuGet packages | S | auto |
-| DEP001 | Medium | Outdated NuGet packages | S | auto |
-| DEP001 | Medium | Outdated NuGet packages | S | auto |
-| DEP001 | Low | Outdated NuGet packages | S | auto |
-| DEP001 | Low | Outdated NuGet packages | S | auto |
-| DEP001 | Low | Outdated NuGet packages | S | auto |
-| DEP001 | Low | Outdated NuGet packages | S | auto |
-| DEP001 | Low | Outdated NuGet packages | S | auto |
-| DEP001 | Low | Outdated NuGet packages | S | auto |
-| DEP001 | Low | Outdated NuGet packages | S | auto |
-| DEP001 | Low | Outdated NuGet packages | S | auto |
-| DEP001 | Low | Outdated NuGet packages | S | auto |
-| DEP001 | Low | Outdated NuGet packages | S | auto |
+| DEP001 | Medium | Outdated NuGet packages (several findings) | S | auto |
+| DEP001 | Low | Outdated NuGet packages (about a dozen findings) | S | auto |
 | VER001 | Low | Xperience by Kentico version | M | manual |
 
 ## Performance
@@ -147,26 +102,10 @@ Performance scores 70, a C, on six findings. The two High findings are both sing
 - **High** — CFG002: Kentico middleware pipeline order (Architecture & configuration)
 - **High** — AUD-SEC-010: Transitive OpenTelemetry.Api carries a known advisory (Security)
 - **High** — AUD-PRF-008: Request path blocks on a Task with .Result (Performance)
-- **Medium** — DEP001: Outdated NuGet packages (Security)
-- **Medium** — DEP001: Outdated NuGet packages (Security)
-- **Medium** — DEP001: Outdated NuGet packages (Security)
-- **Medium** — DEP001: Outdated NuGet packages (Security)
-- **Medium** — DEP001: Outdated NuGet packages (Security)
-- **Medium** — DEP001: Outdated NuGet packages (Security)
-- **Medium** — DEP001: Outdated NuGet packages (Security)
-- **Medium** — DEP001: Outdated NuGet packages (Security)
-- **Low** — CNT001: Unused content types (Content model)
-- **Low** — CNT001: Unused content types (Content model)
+- **Medium** — DEP001: Outdated NuGet packages (several findings) (Security)
+- **Low** — CNT001: Unused content types (a couple of findings) (Content model)
 - **Low** — CNT002: Stale unused reusable content (Content model)
-- **Low** — DEP001: Outdated NuGet packages (Security)
-- **Low** — DEP001: Outdated NuGet packages (Security)
-- **Low** — DEP001: Outdated NuGet packages (Security)
-- **Low** — DEP001: Outdated NuGet packages (Security)
-- **Low** — DEP001: Outdated NuGet packages (Security)
-- **Low** — DEP001: Outdated NuGet packages (Security)
-- **Low** — DEP001: Outdated NuGet packages (Security)
-- **Low** — DEP001: Outdated NuGet packages (Security)
-- **Low** — DEP001: Outdated NuGet packages (Security)
+- **Low** — DEP001: Outdated NuGet packages (about a dozen findings) (Security)
 - **Low** — AUD-PRF-010: Store layout loads web fonts render-blocking (Performance)
 
 **Projects**
@@ -185,46 +124,13 @@ Performance scores 70, a C, on six findings. The two High findings are both sing
 - **Medium** — AUD-PRF-002: Navigation and page controllers query content uncached (Performance)
 - **Medium** — AUD-PRF-003: Content queries select every column (Performance)
 - **Low** — AUD-CM-004: Admin content-creation endpoint files items at the workspace root (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
-- **Low** — CNT003: Stale content (Content model)
+- **Low** — CNT003: Stale content (more than 30 findings) (Content model)
 - **Low** — VER001: Xperience by Kentico version (Security)
 - **Low** — AUD-PRF-006: Images ship in legacy formats at a single size (Performance)
 
 ## Methodology
 
-**What ran.** Sentinel CLI 0.1.0-alpha executed a full scan of the repository on August 26, 2026. Runtime checks were enabled, so the database-backed rules covering unused content types, unreferenced reusable content, stale content, broken media references, widget property data and recent event-log errors all executed against the live CMS database; all thirteen scan checks completed and none failed to execute. On top of that deterministic pass, four AI checklists were evaluated against the repository: `architecture-config.md` (10 checks evaluated, 4 fired), `content-model.md` (10 checks evaluated, 4 fired), `security.md` (10 checks evaluated, 5 fired) and `performance.md` (10 checks evaluated, 6 fired) - 40 checks evaluated and 19 fired in total. One of those 19, the middleware-ordering check in the architecture checklist, reported the same defect at the same location as a Sentinel rule and was deduplicated so the defect is charged once, leaving 18 review findings alongside 61 scan findings for a total of 79.
+**What ran.** Sentinel CLI 0.4.3-alpha executed a full scan of the repository on August 26, 2026. Runtime checks were enabled, so the database-backed rules covering unused content types, unreferenced reusable content, stale content, broken media references, widget property data and recent event-log errors all executed against the live CMS database; all thirteen scan checks completed and none failed to execute. On top of that deterministic pass, four AI checklists were evaluated against the repository: `architecture-config.md` (10 checks evaluated, 4 fired), `content-model.md` (10 checks evaluated, 4 fired), `security.md` (10 checks evaluated, 5 fired) and `performance.md` (10 checks evaluated, 6 fired) - 40 checks evaluated and 19 fired in total. One of those 19, the middleware-ordering check in the architecture checklist, reported the same defect at the same location as a Sentinel rule and was deduplicated so the defect is charged once, leaving 18 review findings alongside 61 scan findings for a total of 79.
 
 **Unverified items.** Several checks separate what the repository can prove from what only a live environment can. The hash salt is declared and empty in configuration as intended, but whether it resolves to a real random value in each deployed environment is unverified. Administrator account hygiene, role assignments and any routing rules configured in front of the administration path outside the repository are unverified. Whether the upload storage location has execute permissions disabled at the hosting layer is unverified. Live content hub folder organisation, published URL slug cleanliness and the channel's former-URL setting were not queried and are unverified. None of these unverified items fired a finding; each is reported here instead.
 
