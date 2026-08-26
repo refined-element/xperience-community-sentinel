@@ -101,7 +101,7 @@ Every finding carries an `instanceKey`: the lowercase hexadecimal SHA-256 digest
 
 In both cases, substitute the literal string `project` for `{location}` when the finding has no location (a repo-wide finding rather than a specific file or line).
 
-AI-sourced findings omit the message from the key because the wording an AI check produces for the same underlying condition can vary between runs. Including the message would give the same finding a different key every run, breaking identity tracking across audits. Sentinel's messages are deterministic templates, so including the message for `source: "sentinel"` findings is safe and adds specificity.
+AI-sourced findings omit the message from the key because the wording an AI check produces for the same underlying condition can vary between runs. Including the message would give the same finding a different key every run, breaking identity tracking across audits. `source: "sentinel"` findings include the message because the message is what disambiguates multiple instances of one rule firing in the same run (the `CNT003` example above fires once per stale item, each with its own location and message) — but that disambiguation only holds while the message text itself stays stable across runs. A message with a time-relative fragment (a day count in a staleness finding, for example) changes on its own from one day's audit to the next even though the underlying condition is otherwise unchanged, and that change flows straight into the `instanceKey`.
 
 ### Worked example
 
@@ -118,6 +118,8 @@ sha256("AUD-SEC-004|Program.cs:42")
 
 A check's verdict is deterministic given the same evidence: fire a finding only when the "Pass when" criteria written in its checklist entry objectively fail. When the evidence is ambiguous, do not fire the finding — note the uncertainty in the report's narrative instead of guessing at a severity or outcome.
 
-The deterministic Sentinel scan layer is identical across runs: two consecutive audits against an unchanged repository must produce the same Sentinel-sourced finding IDs and severities, and the same contribution to each grade. `generatedAt` and free-text message wording may differ between runs; nothing else in that layer should.
+The deterministic Sentinel scan layer is identical across runs: two consecutive audits against an unchanged repository must produce the same Sentinel-sourced finding IDs and severities, and the same contribution to each grade. `generatedAt` and free-text message wording may differ between runs; nothing else in that layer should. That guarantee does not extend to `instanceKey`: because the key for `source: "sentinel"` findings incorporates the message, a message carrying a time-relative fragment (a day count that increments daily is the example above) produces a different `instanceKey` on consecutive days even though the finding's `id`, `location`, and severity are identical both times.
+
+A consumer that diffs findings across runs — the future fix skill, or any tool tracking whether a finding was already addressed — should treat `id` plus `location` as a sentinel finding's durable identity across runs, and use `instanceKey` only for matching an exact instance within the timeframe of a single run.
 
 The AI checklist layer doesn't carry that same guarantee. Its findings are a floor, not an exhaustive census: how much evidence a run manages to surface from the repository can vary between runs even when both apply the same "Pass when" criteria correctly, so one run can find a real defect another run misses. A finding's absence from a given run is not evidence that the underlying check passed — it only means that run didn't surface the evidence to fire it.

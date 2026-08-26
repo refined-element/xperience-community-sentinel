@@ -242,6 +242,10 @@ section — uses these columns, in this order:
 | AUD-SEC-004 | High | Contact endpoint has no rate limit | `Controllers/ContactController.cs` | S | assisted |
 ```
 
+(The row above is an example, not a template to copy literally — the ID/topic
+pairing is illustrative, not the real AUD-SEC-004 check; use the real finding
+data from `audit-findings.json`.)
+
 - **ID** — `finding.id`.
 - **Severity** — `finding.severity`, exactly as stored (`Critical`/`High`/`Medium`/`Low`).
 - **Title** — `finding.title`.
@@ -277,6 +281,10 @@ dimension, then `id`). Format each entry as a single bullet, not a table row:
 ```markdown
 - **High** — AUD-SEC-004: Contact endpoint has no rate limit (Security)
 ```
+
+(The entry above is an example, not a template to copy literally — the ID/topic
+pairing is illustrative, not the real AUD-SEC-004 check; use the real findings
+from `audit-findings.json`.)
 
 ### Methodology
 
@@ -321,8 +329,8 @@ Close the Methodology section with this disclaimer, verbatim:
 ### Next steps
 
 Content: the CTA block below, verbatim, and nothing else — no lead-in sentence,
-no summary, no additional offer beyond the two named here. Never mention KDaaS
-anywhere in this report; it's unrelated to this skill and isn't a public offer.
+no summary, no additional offer beyond the two named here. The report offers exactly
+the two follow-on paths above — never add any other product, service, or offer.
 
 > **Fix these findings at a fixed price.** Run `sentinel quote` to send a sanitized summary of this report to Refined Element and receive an itemized quote.
 >

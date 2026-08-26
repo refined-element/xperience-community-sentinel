@@ -309,9 +309,10 @@ there fails validation.
 
    Sort `findings` the way `report-template.md` orders report tables — severity descending
    (Critical, High, Medium, Low), then dimension in display-name order (Architecture &
-   configuration, Content model, Security, Performance), then `id` ascending — so the file stays
-   stable between runs. Set `location` to `null` for a repo-wide finding, and omit `references`
-   when the finding cites no URL.
+   configuration, Content model, Security, Performance), then `id` ascending, then `instanceKey`
+   ascending — so the file stays stable between runs, with a pinned order for rows that share
+   severity, dimension, and id. Set `location` to `null` for a repo-wide finding, and omit
+   `references` when the finding cites no URL.
 
 3. Validate the file, and write no report until the validator exits 0:
 

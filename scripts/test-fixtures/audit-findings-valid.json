@@ -16,7 +16,7 @@
   "findings": [
     {
       "id": "AUD-SEC-004",
-      "instanceKey": "0000000000000000000000000000000000000000000000000000000000000000",
+      "instanceKey": "5087d4091d0cc9bb79ce9c1dd14c1e2486cb23183274acd6141a0fa388b394ce",
       "source": "ai",
       "dimension": "security",
       "severity": "High",
