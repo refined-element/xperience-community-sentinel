@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/refined-element/xperience-community-sentinel/plugins/sentinel-audit/findings-schema.json",
+  "title": "Sentinel audit findings",
+  "type": "object",
+  "required": ["schemaVersion", "generatedAt", "auditSkillVersion", "sentinel", "target", "grades", "findings"],
+  "additionalProperties": false,
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "auditSkillVersion": { "type": "string" },
+    "sentinel": {
+      "type": "object",
+      "required": ["version", "runtimeEnabled"],
+      "additionalProperties": false,
+      "properties": {
+        "version": { "type": "string" },
+        "runtimeEnabled": { "type": "boolean" }
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": ["repoPath", "xbykVersion"],
+      "additionalProperties": false,
+      "properties": {
+        "repoPath": { "type": "string" },
+        "xbykVersion": { "type": "string" }
+      }
+    },
+    "grades": {
+      "type": "object",
+      "required": ["overall", "dimensions"],
+      "additionalProperties": false,
+      "properties": {
+        "overall": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "dimensions": {
+          "type": "object",
+          "required": ["architecture", "contentModel", "security", "performance"],
+          "additionalProperties": false,
+          "properties": {
+            "architecture": { "$ref": "#/$defs/dimensionGrade" },
+            "contentModel": { "$ref": "#/$defs/dimensionGrade" },
+            "security": { "$ref": "#/$defs/dimensionGrade" },
+            "performance": { "$ref": "#/$defs/dimensionGrade" }
+          }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/finding" }
+    }
+  },
+  "$defs": {
+    "dimensionGrade": {
+      "type": "object",
+      "required": ["score", "grade"],
+      "additionalProperties": false,
+      "properties": {
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "grade": { "enum": ["A", "B", "C", "D", "F"] }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["id", "instanceKey", "source", "dimension", "severity", "title", "message", "remediation", "effort", "fixable"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^(AUD-(ARC|CM|SEC|PRF)-\\d{3}|[A-Z]{3}\\d{3})$" },
+        "instanceKey": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "source": { "enum": ["sentinel", "ai"] },
+        "dimension": { "enum": ["architecture", "contentModel", "security", "performance"] },
+        "severity": { "enum": ["Critical", "High", "Medium", "Low"] },
+        "title": { "type": "string", "minLength": 1 },
+        "message": { "type": "string", "minLength": 1 },
+        "location": { "type": ["string", "null"] },
+        "remediation": { "type": "string", "minLength": 1 },
+        "effort": { "enum": ["S", "M", "L"] },
+        "fixable": { "enum": ["auto", "assisted", "manual"] },
+        "references": { "type": "array", "items": { "type": "string", "format": "uri" } }
+      }
+    }
+  }
+}
