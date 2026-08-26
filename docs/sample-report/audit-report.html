@@ -170,7 +170,10 @@ blockquote p:last-child{margin-bottom:0}
 <p><strong>Grading formula.</strong> Each dimension starts at 100. Every Critical finding subtracts 25 and every High finding subtracts 10, both uncapped. Medium and Low findings are grouped by rule ID and capped per rule: Medium subtracts 4 points per finding up to 12 points per rule ID, Low subtracts 1 point per finding up to 5 points per rule ID, so a single high-volume hygiene rule cannot outweigh a genuine defect. Scores floor at 0 and convert to letters at 90, 80, 70 and 60. The overall score is the unweighted mean of the four dimension scores, rounded half-up.</p>
 <p><strong>Unmapped-rule appendix.</strong> No unmapped Sentinel rules were encountered during this audit. Every rule that produced a finding appears in the dimension-mapping table and in the effort/fixability table, and no Sentinel Internals findings were recorded, so no scan check went unexecuted.</p>
 </div>
-<blockquote><p>This report is an AI-assisted initial pass produced by the open-source Sentinel audit skill. It is not a substitute for a human architect review.</p></blockquote>
+<blockquote>
+<p>This report is an AI-assisted initial pass produced by the open-source Sentinel audit skill. It is not a substitute for a human architect review.</p>
+<p>The AI checklist findings are a floor, not a census: a check that isn't listed here wasn't found to fail, which is not the same as a verified pass.</p>
+</blockquote>
 <h2>Next steps</h2>
 <blockquote>
 <p><strong>Fix these findings at a fixed price.</strong> Run <code>sentinel quote</code> to send a sanitized summary of this report to Refined Element and receive an itemized quote.</p>

@@ -141,6 +141,8 @@ Performance scores 70, a C, on six findings. The two High findings are both sing
 **Unmapped-rule appendix.** No unmapped Sentinel rules were encountered during this audit. Every rule that produced a finding appears in the dimension-mapping table and in the effort/fixability table, and no Sentinel Internals findings were recorded, so no scan check went unexecuted.
 
 > This report is an AI-assisted initial pass produced by the open-source Sentinel audit skill. It is not a substitute for a human architect review.
+>
+> The AI checklist findings are a floor, not a census: a check that isn't listed here wasn't found to fail, which is not the same as a verified pass.
 
 ## Next steps
 
