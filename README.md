@@ -297,5 +297,4 @@ Each check is a single class in `src/XperienceCommunity.Sentinel.Core/Checks/` i
 ## Links
 
 - [Refined Element](https://refinedelement.com) — the consultancy
-- [KDaaS](https://kentico-developer.com) — AI-powered Kentico dev service
 - [Xperience by Kentico](https://www.kentico.com/)
