@@ -1,3 +1,4 @@
+using System.Reflection;
 using XperienceCommunity.Sentinel.Core;
 
 namespace XperienceCommunity.Sentinel.Reporting;
@@ -43,7 +44,16 @@ public sealed record ReportFinding(
 
 public static class ReportBuilder
 {
-    public const string SentinelVersion = "0.1.0-alpha";
+    /// <summary>
+    /// The Core assembly's own version, so report.json always reflects the package that
+    /// actually produced it instead of a hand-maintained literal that can drift. Any
+    /// "+buildmetadata" suffix on the informational version is stripped; falls back to the
+    /// assembly version if no informational version attribute is present at all.
+    /// </summary>
+    public static string SentinelVersion { get; } =
+        typeof(ReportBuilder).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion?.Split('+', 2)[0]
+            ?? typeof(ReportBuilder).Assembly.GetName().Version?.ToString()
+            ?? "0.0.0-unknown";
 
     public static ReportDocument Build(ScanResult result) => new(
         SentinelVersion: SentinelVersion,
