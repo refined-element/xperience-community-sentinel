@@ -315,6 +315,8 @@ State, in prose:
 Close the Methodology section with this disclaimer, verbatim:
 
 > This report is an AI-assisted initial pass produced by the open-source Sentinel audit skill. It is not a substitute for a human architect review.
+>
+> The AI checklist findings are a floor, not a census: a check that isn't listed here wasn't found to fail, which is not the same as a verified pass.
 
 ### Next steps
 

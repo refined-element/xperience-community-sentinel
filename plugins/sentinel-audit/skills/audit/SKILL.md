@@ -45,8 +45,10 @@ Two terms appear throughout:
   `<skill-dir>/references/`.
 
 Two rules apply to every step. State nothing you can't trace to the scan output, the repository,
-or a checklist. Honor `grading.md`'s determinism rule: two runs against an unchanged repository
-produce identical finding IDs, severities, and grades.
+or a checklist. Honor `grading.md`'s determinism rule: a check's verdict comes strictly from
+objective evidence, and `grading.md` defines exactly what stays identical across runs — the
+deterministic Sentinel layer — and what doesn't — the AI checklist layer, which is a floor rather
+than an exhaustive census.
 
 ## 1. Preflight: confirm the target is Xperience by Kentico
 

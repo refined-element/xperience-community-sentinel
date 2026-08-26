@@ -116,6 +116,8 @@ sha256("AUD-SEC-004|Program.cs:42")
 
 ## Determinism rule
 
-A check either fires or it doesn't, based strictly on the "Pass when" criteria written in its checklist entry. When the evidence is ambiguous, do not fire the finding — note the uncertainty in the report's narrative instead of guessing at a severity or outcome.
+A check's verdict is deterministic given the same evidence: fire a finding only when the "Pass when" criteria written in its checklist entry objectively fail. When the evidence is ambiguous, do not fire the finding — note the uncertainty in the report's narrative instead of guessing at a severity or outcome.
 
-Two consecutive audit runs against an unchanged repository must produce identical finding IDs, severities, and grades. `generatedAt` and free-text message wording may differ between runs; nothing else should.
+The deterministic Sentinel scan layer is identical across runs: two consecutive audits against an unchanged repository must produce the same Sentinel-sourced finding IDs and severities, and the same contribution to each grade. `generatedAt` and free-text message wording may differ between runs; nothing else in that layer should.
+
+The AI checklist layer doesn't carry that same guarantee. Its findings are a floor, not an exhaustive census: how much evidence a run manages to surface from the repository can vary between runs even when both apply the same "Pass when" criteria correctly, so one run can find a real defect another run misses. A finding's absence from a given run is not evidence that the underlying check passed — it only means that run didn't surface the evidence to fire it.
