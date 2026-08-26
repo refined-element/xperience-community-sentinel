@@ -23,8 +23,8 @@ The audit writes three files into a `sentinel-audit/` folder inside the audited 
 | `audit-report.md` | The human-readable report |
 | `audit-report.html` | The same report as a self-contained, styled page that matches Sentinel's own scan report |
 
-<!-- sample-report screenshot: audit-report.html cover and scorecard — filled after the first published sample (Task 10) -->
-<!-- sample-report link: docs/sample-report/ — filled after the first published sample (Task 10) -->
+<!-- sample-report screenshot: audit-report.html cover and scorecard — no screenshot tooling available in this environment; see the linked report instead -->
+See a redacted [sample report](../../docs/sample-report/audit-report.md) from a real audit (identifying detail generalized), also available as a [styled HTML page](../../docs/sample-report/audit-report.html).
 
 ## Install
 

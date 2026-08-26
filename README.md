@@ -195,7 +195,7 @@ Then ask Claude Code to `audit this project`. See the
 [sentinel-audit README](plugins/sentinel-audit/README.md) for what you receive, prerequisites, and
 the skill's privacy commitment.
 
-<!-- sample-report link: docs/sample-report/ — filled after the first published sample (Task 10) -->
+See a redacted [sample report](docs/sample-report/audit-report.md) from a real audit, with identifying detail generalized.
 
 Free and MIT-licensed, like the rest of Sentinel.
 
