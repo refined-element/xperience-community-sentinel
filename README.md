@@ -179,26 +179,6 @@ sentinel scan --repo owner/your-xbyk-site
 sentinel quote --report ./sentinel-report/report.json
 ```
 
-## Run an AI audit
-
-For a narrative health check beyond the rule-based scan above, install the `sentinel-audit` Claude
-Code skill. It wraps the Sentinel CLI scan, reviews your project against 40 additional checks across
-architecture, content model, security, and performance, and writes a consulting-grade report you can
-hand to a stakeholder as-is.
-
-```
-/plugin marketplace add refined-element/xperience-community-sentinel
-/plugin install sentinel-audit@xperience-community-sentinel
-```
-
-Then ask Claude Code to `audit this project`. See the
-[sentinel-audit README](plugins/sentinel-audit/README.md) for what you receive, prerequisites, and
-the skill's privacy commitment.
-
-See a redacted [sample report](docs/sample-report/audit-report.md) from a real audit, with identifying detail generalized.
-
-Free and MIT-licensed, like the rest of Sentinel.
-
 ## Convenience scripts
 
 If your project uses `dotnet user-secrets` for its connection string (the Kentico-recommended default),
